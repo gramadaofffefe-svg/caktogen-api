@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CaktoGen | Automação Total</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Space Mono', 'monospace'] },
+                    colors: {
+                        bgVoid: '#000000', bgPanel: '#08080a', bgInput: '#101012',
+                        borderNeon: 'rgba(139, 92, 246, 0.3)', borderGreen: 'rgba(16, 185, 129, 0.3)',
+                        textMain: '#ffffff', textMuted: '#71717a',
+                        accent: '#8b5cf6', accentHover: '#7c3aed', accentGlow: 'rgba(139, 92, 246, 0.5)',
+                        neon: '#10b981', neonGlow: 'rgba(16, 185, 129, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; height: 100dvh; overflow: hidden; display: flex; }
+        .bg-grid { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at center, black 40%, transparent 100%); -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%); }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+        .glass-panel { background: rgba(8, 8, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .fade-up { animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; } @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; } .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; } @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .btn-purple { background: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); transition: all 0.3s; } .btn-purple:hover { box-shadow: 0 0 25px rgba(139, 92, 246, 0.7); background: #7c3aed; }
+        .gradient-border { position: relative; background: #08080a; } .gradient-border::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.5), rgba(16, 185, 129, 0.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+    </style>
+</head>
+<body class="antialiased text-[15px] leading-relaxed">
+    <div class="bg-grid"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-30 hidden md:hidden transition-opacity"></div>
+
+    <aside id="sidebar" class="w-[280px] bg-bgPanel flex flex-col h-full border-r border-white/5 transition-transform -translate-x-full md:translate-x-0 fixed md:relative z-40">
+        <div class="p-6 flex items-center gap-3 cursor-pointer group" onclick="mudarView('chat')">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-purple-400 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.4)] group-hover:scale-105 transition-transform">
+                <i class="ph ph-hexagon text-white text-xl font-bold"></i>
+            </div>
+            <span class="font-extrabold text-xl tracking-tighter text-white">CAKTOGEN</span>
+        </div>
+        <div class="px-4 space-y-2 mb-6">
+            <button onclick="mudarView('chat')" id="nav-chat" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accentGlow text-accent font-semibold transition-all gradient-border">
+                <i class="ph ph-magic-wand text-xl"></i> Criar Infoproduto
+            </button>
+            <button onclick="mudarView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:text-white hover:bg-white/5 font-medium transition-all">
+                <i class="ph ph-chart-line-up text-xl"></i> Dashboard
+            </button>
+        </div>
+        <div class="p-4 mt-auto border-t border-white/5 bg-black/40">
+            <button onclick="abrirConfig()" class="w-full flex items-center gap-3 hover:bg-white/5 p-3 rounded-xl transition-all group">
+                <div class="w-8 h-8 rounded-full bg-bgInput flex items-center justify-center text-textMuted group-hover:text-white transition-colors">
+                    <i class="ph ph-gear text-lg"></i>
+                </div>
+                <div class="text-left"><div class="text-xs font-bold text-white tracking-widest">CONFIG</div><div class="text-[10px] font-mono text-textMuted">APIs & INTEGRAÇÕES</div></div>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative min-w-0 bg-black/20">
+        <header class="md:hidden flex items-center justify-between p-4 glass-panel z-20 border-b border-white/5">
+            <button onclick="toggleSidebar()" class="p-2 text-textMuted hover:text-white rounded-lg"><i class="ph ph-list text-xl"></i></button>
+            <span class="font-extrabold text-sm tracking-widest text-white">CAKTOGEN</span>
+            <button onclick="abrirConfig()" class="p-2 text-textMuted hover:text-white rounded-lg"><i class="ph ph-gear text-xl"></i></button>
+        </header>
+
+        <div id="view-chat" class="flex-1 flex flex-col h-full w-full absolute inset-0 pt-[60px] md:pt-0">
+            <div id="chatContainer" class="flex-1 overflow-y-auto w-full pt-6 pb-40 px-4 flex flex-col">
+                <div class="chat-row flex-1 flex flex-col justify-center items-center text-center space-y-6 fade-up">
+                    <div class="w-20 h-20 rounded-2xl bg-bgPanel border border-white/10 flex items-center justify-center mb-2 relative shadow-[0_0_40px_rgba(139,92,246,0.15)]">
+                        <i class="ph ph-sparkle text-4xl text-white relative z-10"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tighter uppercase">Crie & <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-neon">Publique</span></h1>
+                    <p class="text-textMuted max-w-md text-sm font-mono">> A IA cria e envia 100% automático para a Cakto.</p>
+                </div>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black to-transparent pt-12 pb-6 px-4 z-10">
+                <div class="chat-row bg-bgInput rounded-2xl border border-white/10 focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all flex items-end px-3 py-2 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                    <textarea id="userInput" rows="1" placeholder="Ex: Crie um e-book de receitas fit por R$ 19,90..." class="w-full bg-transparent text-white resize-none focus:outline-none max-h-48 overflow-y-auto py-2.5 px-2 text-[15px] font-mono placeholder-textMuted/40"></textarea>
+                    <button onclick="enviarMensagem()" id="sendBtn" class="p-3 mb-1 btn-purple text-white rounded-xl transition disabled:opacity-30 disabled:bg-gray-600"><i class="ph ph-arrow-up text-lg font-bold"></i></button>
+                </div>
+                <div class="text-center text-[10px] font-mono text-textMuted mt-3 uppercase tracking-widest">SISTEMA AUTÔNOMO CAKTOGEN v3.0</div>
+            </div>
+        </div>
+
+        <div id="view-dashboard" class="hidden flex-1 overflow-y-auto w-full absolute inset-0 pt-[60px] md:pt-0 p-4 md:p-8 fade-up">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+                    <div><div class="text-xs font-mono text-accent mb-2">> DATA_ANALYTICS</div><h1 class="text-4xl font-extrabold text-white tracking-tighter uppercase">Dashboard</h1></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-bgPanel border border-white/5 p-6 rounded-2xl relative"><div class="flex items-center justify-between text-textMuted mb-4 font-mono text-xs"><span>RECEITA_TOTAL</span><i class="ph ph-currency-circle-dollar text-xl text-accent"></i></div><div class="text-4xl font-extrabold text-white tracking-tight">R$ 4.290</div><div class="text-xs text-neon mt-3 flex items-center gap-1.5 font-mono"><i class="ph ph-trend-up text-base"></i> +12.5% MÊS</div></div>
+                    <div class="bg-bgPanel border border-white/5 p-6 rounded-2xl relative"><div class="flex items-center justify-between text-textMuted mb-4 font-mono text-xs"><span>VENDAS</span><i class="ph ph-shopping-cart text-xl text-blue-400"></i></div><div class="text-4xl font-extrabold text-white tracking-tight">143</div><div class="text-xs text-neon mt-3 flex items-center gap-1.5 font-mono"><i class="ph ph-trend-up text-base"></i> +8% SEMANA</div></div>
+                    <div class="bg-bgPanel border border-white/5 p-6 rounded-2xl relative"><div class="flex items-center justify-between text-textMuted mb-4 font-mono text-xs"><span>PRODUTOS</span><i class="ph ph-package text-xl text-purple-400"></i></div><div class="text-4xl font-extrabold text-white tracking-tight">5</div><div class="text-xs text-textMuted mt-3 font-mono">CRIADOS_POR_IA</div></div>
+                </div>
+                <div class="bg-bgPanel border border-white/5 p-8 rounded-2xl">
+                    <h2 class="text-xs font-mono text-textMuted mb-8 uppercase tracking-widest">> GRÁFICO_DE_VENDAS</h2>
+                    <div class="h-72 w-full"><canvas id="salesChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="configModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl hidden items-center justify-center p-4">
+        <div class="bg-bgPanel w-full max-w-lg rounded-3xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh] fade-up relative shadow-[0_0_50px_rgba(0,0,0,1)]">
+            <div class="flex items-center justify-between p-6 border-b border-white/5">
+                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white"><i class="ph ph-terminal-window text-lg"></i></div><h2 class="font-bold text-lg text-white font-mono tracking-tight">CONFIGURAÇÕES</h2></div>
+                <button onclick="fecharConfig()" class="p-2 text-textMuted hover:text-white rounded-lg hover:bg-white/5 transition"><i class="ph ph-x text-lg"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-8">
+                <div>
+                    <label class="text-[10px] font-mono text-textMuted mb-3 block uppercase tracking-widest">> PROVEDOR DE IA</label>
+                    <div class="flex gap-2 bg-black p-1.5 rounded-xl border border-white/5">
+                        <button onclick="mudarProvedor('openrouter')" id="tab-openrouter" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg bg-white text-black transition-all">OPENROUTER</button>
+                        <button onclick="mudarProvedor('gemini')" id="tab-gemini" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg text-textMuted hover:text-white transition-all">GEMINI</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-textMuted mb-2 block uppercase tracking-widest">> API KEY (IA)</label>
+                    <div class="relative"><i class="ph ph-key absolute left-4 top-3.5 text-textMuted text-lg"></i><input type="password" id="apiKeyIA" placeholder="Sua chave secreta..." class="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
+                </div>
+                <hr class="border-white/5">
+                <div class="space-y-4">
+                    <label class="text-[10px] font-mono text-textMuted mb-3 block uppercase tracking-widest">> INTEGRAÇÃO CAKTO (AUTOMAÇÃO)</label>
+                    <div><input type="text" id="caktoClientId" placeholder="Client ID" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
+                    <div><input type="password" id="caktoClientSecret" placeholder="Client Secret" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
+                    <div class="pt-2">
+                        <label class="text-[10px] font-mono text-textMuted mb-2 block uppercase tracking-widest">> URL DO SEU VERCEL (API)</label>
+                        <input type="text" id="vercelUrl" placeholder="Ex: https://meu-projeto.vercel.app" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30">
+                        <p class="text-[10px] text-textMuted mt-2 font-mono">> O Vercel fará a ponte sem bloqueio de CORS</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-white/5 bg-black/50"><button onclick="salvarConfig()" class="w-full bg-white text-black hover:bg-gray-200 font-bold font-mono py-3.5 rounded-xl transition-all">SALVAR E FECHAR</button></div>
+        </div>
+    </div>
+
+    <script>
+        let currentProvider = 'openrouter';
+        let chartInstance = null;
+        const MODELOS_FALLBACK = ["openrouter/auto", "meta-llama/llama-3.3-70b-instruct:free", "google/gemma-2-9b-it:free"];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem('cg_provider')) currentProvider = localStorage.getItem('cg_provider');
+            if(localStorage.getItem('cg_ia_key')) document.getElementById('apiKeyIA').value = localStorage.getItem('cg_ia_key');
+            if(localStorage.getItem('cg_cakto_id')) document.getElementById('caktoClientId').value = localStorage.getItem('cg_cakto_id');
+            if(localStorage.getItem('cg_cakto_secret')) document.getElementById('caktoClientSecret').value = localStorage.getItem('cg_cakto_secret');
+            if(localStorage.getItem('cg_vercel_url')) document.getElementById('vercelUrl').value = localStorage.getItem('cg_vercel_url');
+            mudarProvedor(currentProvider);
+            const tx = document.getElementById('userInput');
+            tx.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; });
+            tx.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMensagem(); } });
+        });
+
+        function toggleSidebar() { const sb = document.getElementById('sidebar'); const ov = document.getElementById('overlay'); if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); ov.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); ov.classList.add('hidden'); } }
+        function abrirConfig() { document.getElementById('configModal').classList.remove('hidden'); document.getElementById('configModal').classList.add('flex'); }
+        function fecharConfig() { document.getElementById('configModal').classList.add('hidden'); document.getElementById('configModal').classList.remove('flex'); }
+        function mudarProvedor(prov) { currentProvider = prov; ['openrouter', 'gemini'].forEach(p => { const el = document.getElementById('tab-' + p); if(p === prov) { el.classList.add('bg-white', 'text-black'); el.classList.remove('text-textMuted'); } else { el.classList.remove('bg-white', 'text-black'); el.classList.add('text-textMuted'); } }); }
+        
+        function salvarConfig() {
+            localStorage.setItem('cg_provider', currentProvider);
+            localStorage.setItem('cg_ia_key', document.getElementById('apiKeyIA').value.trim());
+            localStorage.setItem('cg_cakto_id', document.getElementById('caktoClientId').value.trim());
+            localStorage.setItem('cg_cakto_secret', document.getElementById('caktoClientSecret').value.trim());
+            localStorage.setItem('cg_vercel_url', document.getElementById('vercelUrl').value.trim());
+            fecharConfig();
+        }
+
+        function mudarView(view) {
+            const viewChat = document.getElementById('view-chat'); const viewDash = document.getElementById('view-dashboard');
+            const navChat = document.getElementById('nav-chat'); const navDash = document.getElementById('nav-dashboard');
+            if(view === 'chat') {
+                viewChat.classList.remove('hidden'); viewDash.classList.add('hidden');
+                navChat.classList.add('bg-accentGlow', 'text-accent', 'gradient-border'); navChat.classList.remove('text-textMuted');
+                navDash.classList.remove('bg-accentGlow', 'text-accent', 'gradient-border'); navDash.classList.add('text-textMuted');
+            } else {
+                viewChat.classList.add('hidden'); viewDash.classList.remove('hidden');
+                navDash.classList.add('bg-accentGlow', 'text-accent', 'gradient-border'); navDash.classList.remove('text-textMuted');
+                navChat.classList.remove('bg-accentGlow', 'text-accent', 'gradient-border'); navChat.classList.add('text-textMuted');
+                initChart();
+            }
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        function initChart() {
+            if(chartInstance) return;
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            Chart.defaults.color = '#71717a'; Chart.defaults.font.family = 'Space Mono';
+            let gradient = ctx.createLinearGradient(0, 0, 0, 300); gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)'); gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+            chartInstance = new Chart(ctx, { type: 'line', data: { labels: ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'], datasets: [{ label: 'Vendas', data: [120, 190, 300, 500, 200, 300, 450], borderColor: '#8b5cf6', backgroundColor: gradient, borderWidth: 2, pointBackgroundColor: '#000000', pointBorderColor: '#8b5cf6', pointBorderWidth: 2, pointRadius: 4, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }, x: { grid: { display: false }, border: { display: false } } } } });
+        }
+
+        function appendMsg(role, text) {
+            const c = document.getElementById('chatContainer'); const isUser = role === 'user';
+            if(c.querySelector('h1')) c.innerHTML = '';
+            const wrapper = document.createElement('div'); wrapper.className = "chat-row flex gap-4 mb-6 fade-up";
+            const avatar = isUser ? `<div class="w-9 h-9 rounded-xl bg-bgInput border border-white/10 flex-shrink-0 flex items-center justify-center text-textMuted"><i class="ph ph-user text-lg"></i></div>` : `<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-purple-400 flex-shrink-0 flex items-center justify-center text-white shadow-lg shadow-accentGlow"><i class="ph ph-sparkle text-xl"></i></div>`;
+            let formattedText = text;
+            if(!isUser) { formattedText = text.replace(/## (.*?)\n/g, '<h3 class="text-lg font-bold text-white mt-4 mb-2">$1</h3>').replace(/\*\*(.*?)\*\*/g, '<b class="text-white">$1</b>').replace(/\*(.*?)\*/g, '<i>$1</i>').replace(/\n/g, '<br>'); }
+            wrapper.innerHTML = `${avatar}<div class="flex-1 ${isUser ? 'bg-bgInput px-5 py-3.5 rounded-2xl rounded-tr-sm w-fit ml-auto border border-white/5 text-gray-200 font-mono text-sm' : 'text-gray-300 py-2 font-light text-[15px] leading-relaxed'}">${formattedText}</div>`;
+            c.appendChild(wrapper); c.scrollTop = c.scrollHeight;
+        }
+
+        function showLoader() {
+            const c = document.getElementById('chatContainer'); const div = document.createElement('div'); div.id = 'loader'; div.className = 'chat-row flex gap-4 mb-6 fade-up';
+            div.innerHTML = `<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-purple-400 flex-shrink-0 flex items-center justify-center text-white shadow-lg shadow-accentGlow"><i class="ph ph-sparkle text-xl"></i></div><div class="flex items-center gap-1.5 h-9"><div class="w-2.5 h-2.5 bg-accent rounded-full typing-dot"></div><div class="w-2.5 h-2.5 bg-accent rounded-full typing-dot"></div><div class="w-2.5 h-2.5 bg-accent rounded-full typing-dot"></div></div>`;
+            c.appendChild(div); c.scrollTop = c.scrollHeight;
+        }
+        function removeLoader() { const el = document.getElementById('loader'); if(el) el.remove(); }
+
+        async function enviarMensagem() {
+            const input = document.getElementById('userInput'); const text = input.value.trim();
+            const iaKey = localStorage.getItem('cg_ia_key');
+            const caktoId = localStorage.getItem('cg_cakto_id');
+            const caktoSecret = localStorage.getItem('cg_cakto_secret');
+            const vercelUrl = localStorage.getItem('cg_vercel_url');
+
+            if (!text) return;
+            if (!iaKey) { alert('Insira sua API Key nas configurações.'); abrirConfig(); return; }
+
+            input.value = ''; input.style.height = 'auto'; document.getElementById('sendBtn').disabled = true;
+            appendMsg('user', text); showLoader();
+
+            try {
+                const systemPrompt = `Se o usuário pedir para CRIAR algo, gere a copy e inclua um bloco JSON no final: {"acao": "criar_produto", "nome": "Nome", "preco": 19.90, "descricao": "Copy"}. Se for conversa, responda normal.`;
+                let responseText = "";
+
+                if (currentProvider === 'openrouter') {
+                    let lastErr = "";
+                    for (const model of MODELOS_FALLBACK) {
+                        try {
+                            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", { method: "POST", headers: { "Authorization": `Bearer ${iaKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ model, messages: [{ role: "system", content: systemPrompt }, { role: "user", content: text }] }) });
+                            const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                            responseText = data.choices[0].message.content.trim(); break; 
+                        } catch(e) { lastErr = e.message; }
+                    }
+                    if(!responseText) throw new Error("Modelos grátis falharam. " + lastErr);
+                } else if (currentProvider === 'gemini') {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${iaKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }, { text: text }] }] }) });
+                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                    responseText = data.candidates[0].content.parts[0].text.trim();
+                }
+
+                responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const jsonMatch = responseText.match(/\{"acao":\s*"criar_produto".*?\}/s);
+                
+                removeLoader();
+
+                if (jsonMatch) {
+                    const productData = JSON.parse(jsonMatch[0]);
+                    const textoVisivel = responseText.replace(jsonMatch[0], '').trim();
+                    if(textoVisivel) appendMsg('ai', textoVisivel);
+                    
+                    appendMsg('ai', `> Produto **${productData.nome}** estruturado. Iniciando automação total...`);
+
+                    if(!caktoId || !caktoSecret || !vercelUrl) {
+                        setTimeout(() => appendMsg('ai', `⚠️ **Falta configurar.** Vá em Config e insira o Client ID, Secret e a URL do Vercel para ativar a automação real.`), 600);
+                        document.getElementById('sendBtn').disabled = false; return;
+                    }
+
+                    // Chamada para a sua API no Vercel (Ponte)
+                    const res = await fetch(`${vercelUrl}/api/criar-produto`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            clientId: caktoId,
+                            clientSecret: caktoSecret,
+                            nome: productData.nome,
+                            descricao: productData.descricao,
+                            preco: productData.preco
+                        })
+                    });
+
+                    const result = await res.json();
+
+                    if(res.ok) {
+                        setTimeout(() => appendMsg('ai', `🎉 **Produto Criado na Cakto!**<br>ID da Cakto: ${result.id || 'Sucesso'}<br>O produto já está no seu painel.`), 600);
+                    } else {
+                        setTimeout(() => appendMsg('ai', `❌ **Erro no Vercel/Cakto:** ${result.error || 'Verifique os logs.'}`), 600);
+                    }
+                } else {
+                    appendMsg('ai', responseText);
+                }
+
+            } catch (e) {
+                removeLoader(); appendMsg('ai', `❌ **Erro:** ${e.message}.`);
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
