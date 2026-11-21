@@ -18,9 +18,10 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Space Mono', 'monospace'] },
                     colors: {
                         bgVoid: '#000000', bgPanel: '#08080a', bgInput: '#101012',
-                        borderNeon: 'rgba(139, 92, 246, 0.3)', textMain: '#ffffff', textMuted: '#71717a',
+                        borderNeon: 'rgba(139, 92, 246, 0.3)', borderGreen: 'rgba(16, 185, 129, 0.3)',
+                        textMain: '#ffffff', textMuted: '#71717a',
                         accent: '#8b5cf6', accentHover: '#7c3aed', accentGlow: 'rgba(139, 92, 246, 0.5)',
-                        neon: '#10b981'
+                        neon: '#10b981', neonGlow: 'rgba(16, 185, 129, 0.5)'
                     }
                 }
             }
@@ -88,7 +89,7 @@
                     <textarea id="userInput" rows="1" placeholder="Ex: Crie um e-book de receitas fit por R$ 19,90..." class="w-full bg-transparent text-white resize-none focus:outline-none max-h-48 overflow-y-auto py-2.5 px-2 text-[15px] font-mono placeholder-textMuted/40"></textarea>
                     <button onclick="enviarMensagem()" id="sendBtn" class="p-3 mb-1 btn-purple text-white rounded-xl transition disabled:opacity-30 disabled:bg-gray-600"><i class="ph ph-arrow-up text-lg font-bold"></i></button>
                 </div>
-                <div class="text-center text-[10px] font-mono text-textMuted mt-3 uppercase tracking-widest">SISTEMA AUTÔNOMO CAKTOGEN v3.2</div>
+                <div class="text-center text-[10px] font-mono text-textMuted mt-3 uppercase tracking-widest">SISTEMA AUTÔNOMO CAKTOGEN v3.3</div>
             </div>
         </div>
 
@@ -145,7 +146,6 @@
     </div>
 
     <script>
-        // MUDANÇA IMPORTANTE: Agora o padrão é o Gemini!
         let currentProvider = 'gemini';
         let chartInstance = null;
 
@@ -176,7 +176,7 @@
             }); 
             const hint = document.getElementById('hintIA');
             if(prov === 'gemini') hint.innerText = "> Obtenha grátis em aistudio.google.com/app/apikey";
-            if(prov === 'openrouter') hint.innerText = "> Obtenha grátis em openrouter.ai/keys (Sujeito a instabilidade)";
+            if(prov === 'openrouter') hint.innerText = "> Obtenha grátis em openrouter.ai/keys";
         }
         
         function salvarConfig() {
@@ -246,27 +246,38 @@
             appendMsg('user', text); showLoader();
 
             try {
-                // PROMPT BLINDADO: A IA agora entende que deve criar o produto e mandar os dados
                 const systemPrompt = `Você é o CaktoGen, um assistente autônomo.
-                Se o usuário pedir para CRIAR um produto (ex: "crie um e-book", "monte uma mentoria", "crie um produto"), você deve:
+                Se o usuário pedir para CRIAR um produto, você deve:
                 1. Criar uma copy de vendas persuasiva.
                 2. Escolher um nome atrativo.
-                3. Escolher um preço justo (se o usuário não especificar).
+                3. Escolher um preço justo.
                 4. Incluir OBRIGATORIAMENTE no final da resposta um JSON exatamente neste formato, sem marcações de código (sem \`\`\`):
-                {"acao": "criar_produto", "nome": "Nome do Produto", "preco": 19.90, "descricao": "A copy de vendas que você escreveu"}
+                {"acao": "criar_produto", "nome": "Nome do Produto", "preco": 19.90, "descricao": "A copy"}
                 
                 Se o usuário estiver apenas conversando, responda normalmente, sem o JSON.`;
 
                 let responseText = "";
 
                 if (currentProvider === 'gemini') {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${iaKey}`, {
+                    // Busca o modelo mais novo grátis
+                    let bestModel = "gemini-1.5-flash";
+                    try {
+                        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${iaKey}`);
+                        const listData = await listRes.json();
+                        if(listData.models) {
+                            const validModels = listData.models.filter(m => m.name.includes('gemini') && m.name.includes('flash') && m.supportedGenerationMethods.includes('generateContent'));
+                            if(validModels.length > 0) bestModel = validModels[validModels.length - 1].name.replace('models/', '');
+                        }
+                    } catch(e) {}
+
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${bestModel}:generateContent?key=${iaKey}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }, { text: text }] }] })
                     });
                     const data = await res.json();
                     if(data.error) throw new Error(data.error.message);
                     responseText = data.candidates[0].content.parts[0].text.trim();
+                    
                 } else if (currentProvider === 'openrouter') {
                     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                         method: "POST", headers: { "Authorization": `Bearer ${iaKey}`, "Content-Type": "application/json" },
@@ -289,11 +300,11 @@
                     appendMsg('ai', `> Produto **${productData.nome}** (R$ ${productData.preco.toFixed(2)}) estruturado. Iniciando automação total...`);
 
                     if(!caktoId || !caktoSecret || !vercelUrl) {
-                        setTimeout(() => appendMsg('ai', `⚠️ **Configuração Incompleta.** Vá em Config (⚙️) e preencha a API Key, Client ID, Secret e a URL do Vercel para liberar a criação automática.`), 600);
+                        setTimeout(() => appendMsg('ai', `⚠️ **Configuração Incompleta.** Vá em Config (⚙️) e preencha os dados da Cakto e a URL do Vercel.`), 600);
                         document.getElementById('sendBtn').disabled = false; return;
                     }
 
-                    // Chama a Ponte que criamos no Vercel
+                    // Chamada para o Vercel
                     const res = await fetch(`${vercelUrl}/api/criar-produto`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
