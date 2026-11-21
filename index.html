@@ -18,10 +18,9 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Space Mono', 'monospace'] },
                     colors: {
                         bgVoid: '#000000', bgPanel: '#08080a', bgInput: '#101012',
-                        borderNeon: 'rgba(139, 92, 246, 0.3)', borderGreen: 'rgba(16, 185, 129, 0.3)',
-                        textMain: '#ffffff', textMuted: '#71717a',
+                        borderNeon: 'rgba(139, 92, 246, 0.3)', textMain: '#ffffff', textMuted: '#71717a',
                         accent: '#8b5cf6', accentHover: '#7c3aed', accentGlow: 'rgba(139, 92, 246, 0.5)',
-                        neon: '#10b981', neonGlow: 'rgba(16, 185, 129, 0.5)'
+                        neon: '#10b981'
                     }
                 }
             }
@@ -81,7 +80,7 @@
                         <i class="ph ph-sparkle text-4xl text-white relative z-10"></i>
                     </div>
                     <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tighter uppercase">Crie & <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-neon">Publique</span></h1>
-                    <p class="text-textMuted max-w-md text-sm font-mono">> A IA cria e envia 100% automático para a Cakto.</p>
+                    <p class="text-textMuted max-w-md text-sm font-mono">> Diga o que quer vender. A IA faz todo o resto.</p>
                 </div>
             </div>
             <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black to-transparent pt-12 pb-6 px-4 z-10">
@@ -89,7 +88,7 @@
                     <textarea id="userInput" rows="1" placeholder="Ex: Crie um e-book de receitas fit por R$ 19,90..." class="w-full bg-transparent text-white resize-none focus:outline-none max-h-48 overflow-y-auto py-2.5 px-2 text-[15px] font-mono placeholder-textMuted/40"></textarea>
                     <button onclick="enviarMensagem()" id="sendBtn" class="p-3 mb-1 btn-purple text-white rounded-xl transition disabled:opacity-30 disabled:bg-gray-600"><i class="ph ph-arrow-up text-lg font-bold"></i></button>
                 </div>
-                <div class="text-center text-[10px] font-mono text-textMuted mt-3 uppercase tracking-widest">SISTEMA AUTÔNOMO CAKTOGEN v3.0</div>
+                <div class="text-center text-[10px] font-mono text-textMuted mt-3 uppercase tracking-widest">SISTEMA AUTÔNOMO CAKTOGEN v3.2</div>
             </div>
         </div>
 
@@ -121,23 +120,23 @@
                 <div>
                     <label class="text-[10px] font-mono text-textMuted mb-3 block uppercase tracking-widest">> PROVEDOR DE IA</label>
                     <div class="flex gap-2 bg-black p-1.5 rounded-xl border border-white/5">
-                        <button onclick="mudarProvedor('openrouter')" id="tab-openrouter" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg bg-white text-black transition-all">OPENROUTER</button>
-                        <button onclick="mudarProvedor('gemini')" id="tab-gemini" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg text-textMuted hover:text-white transition-all">GEMINI</button>
+                        <button onclick="mudarProvedor('gemini')" id="tab-gemini" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg bg-white text-black transition-all">GEMINI</button>
+                        <button onclick="mudarProvedor('openrouter')" id="tab-openrouter" class="flex-1 py-2 text-xs font-mono font-bold rounded-lg text-textMuted hover:text-white transition-all">OPENROUTER</button>
                     </div>
                 </div>
                 <div>
                     <label class="text-[10px] font-mono text-textMuted mb-2 block uppercase tracking-widest">> API KEY (IA)</label>
                     <div class="relative"><i class="ph ph-key absolute left-4 top-3.5 text-textMuted text-lg"></i><input type="password" id="apiKeyIA" placeholder="Sua chave secreta..." class="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
+                    <p id="hintIA" class="text-[10px] font-mono text-textMuted mt-2 ml-1">> aistudio.google.com</p>
                 </div>
                 <hr class="border-white/5">
                 <div class="space-y-4">
-                    <label class="text-[10px] font-mono text-textMuted mb-3 block uppercase tracking-widest">> INTEGRAÇÃO CAKTO (AUTOMAÇÃO)</label>
+                    <label class="text-[10px] font-mono text-textMuted mb-3 block uppercase tracking-widest">> INTEGRAÇÃO CAKTO</label>
                     <div><input type="text" id="caktoClientId" placeholder="Client ID" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
                     <div><input type="password" id="caktoClientSecret" placeholder="Client Secret" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30"></div>
                     <div class="pt-2">
                         <label class="text-[10px] font-mono text-textMuted mb-2 block uppercase tracking-widest">> URL DO SEU VERCEL (API)</label>
-                        <input type="text" id="vercelUrl" placeholder="Ex: https://meu-projeto.vercel.app" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30">
-                        <p class="text-[10px] text-textMuted mt-2 font-mono">> O Vercel fará a ponte sem bloqueio de CORS</p>
+                        <input type="text" id="vercelUrl" placeholder="Ex: https://caktogen-api.vercel.app" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent/50 placeholder-textMuted/30">
                     </div>
                 </div>
             </div>
@@ -146,9 +145,9 @@
     </div>
 
     <script>
-        let currentProvider = 'openrouter';
+        // MUDANÇA IMPORTANTE: Agora o padrão é o Gemini!
+        let currentProvider = 'gemini';
         let chartInstance = null;
-        const MODELOS_FALLBACK = ["openrouter/auto", "meta-llama/llama-3.3-70b-instruct:free", "google/gemma-2-9b-it:free"];
 
         document.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('cg_provider')) currentProvider = localStorage.getItem('cg_provider');
@@ -156,7 +155,9 @@
             if(localStorage.getItem('cg_cakto_id')) document.getElementById('caktoClientId').value = localStorage.getItem('cg_cakto_id');
             if(localStorage.getItem('cg_cakto_secret')) document.getElementById('caktoClientSecret').value = localStorage.getItem('cg_cakto_secret');
             if(localStorage.getItem('cg_vercel_url')) document.getElementById('vercelUrl').value = localStorage.getItem('cg_vercel_url');
+            
             mudarProvedor(currentProvider);
+            
             const tx = document.getElementById('userInput');
             tx.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; });
             tx.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMensagem(); } });
@@ -165,14 +166,27 @@
         function toggleSidebar() { const sb = document.getElementById('sidebar'); const ov = document.getElementById('overlay'); if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); ov.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); ov.classList.add('hidden'); } }
         function abrirConfig() { document.getElementById('configModal').classList.remove('hidden'); document.getElementById('configModal').classList.add('flex'); }
         function fecharConfig() { document.getElementById('configModal').classList.add('hidden'); document.getElementById('configModal').classList.remove('flex'); }
-        function mudarProvedor(prov) { currentProvider = prov; ['openrouter', 'gemini'].forEach(p => { const el = document.getElementById('tab-' + p); if(p === prov) { el.classList.add('bg-white', 'text-black'); el.classList.remove('text-textMuted'); } else { el.classList.remove('bg-white', 'text-black'); el.classList.add('text-textMuted'); } }); }
+        
+        function mudarProvedor(prov) { 
+            currentProvider = prov; 
+            ['gemini', 'openrouter'].forEach(p => { 
+                const el = document.getElementById('tab-' + p); 
+                if(p === prov) { el.classList.add('bg-white', 'text-black'); el.classList.remove('text-textMuted'); } 
+                else { el.classList.remove('bg-white', 'text-black'); el.classList.add('text-textMuted'); } 
+            }); 
+            const hint = document.getElementById('hintIA');
+            if(prov === 'gemini') hint.innerText = "> Obtenha grátis em aistudio.google.com/app/apikey";
+            if(prov === 'openrouter') hint.innerText = "> Obtenha grátis em openrouter.ai/keys (Sujeito a instabilidade)";
+        }
         
         function salvarConfig() {
             localStorage.setItem('cg_provider', currentProvider);
             localStorage.setItem('cg_ia_key', document.getElementById('apiKeyIA').value.trim());
             localStorage.setItem('cg_cakto_id', document.getElementById('caktoClientId').value.trim());
             localStorage.setItem('cg_cakto_secret', document.getElementById('caktoClientSecret').value.trim());
-            localStorage.setItem('cg_vercel_url', document.getElementById('vercelUrl').value.trim());
+            let url = document.getElementById('vercelUrl').value.trim();
+            if(url.endsWith('/')) url = url.slice(0, -1);
+            localStorage.setItem('cg_vercel_url', url);
             fecharConfig();
         }
 
@@ -232,23 +246,34 @@
             appendMsg('user', text); showLoader();
 
             try {
-                const systemPrompt = `Se o usuário pedir para CRIAR algo, gere a copy e inclua um bloco JSON no final: {"acao": "criar_produto", "nome": "Nome", "preco": 19.90, "descricao": "Copy"}. Se for conversa, responda normal.`;
+                // PROMPT BLINDADO: A IA agora entende que deve criar o produto e mandar os dados
+                const systemPrompt = `Você é o CaktoGen, um assistente autônomo.
+                Se o usuário pedir para CRIAR um produto (ex: "crie um e-book", "monte uma mentoria", "crie um produto"), você deve:
+                1. Criar uma copy de vendas persuasiva.
+                2. Escolher um nome atrativo.
+                3. Escolher um preço justo (se o usuário não especificar).
+                4. Incluir OBRIGATORIAMENTE no final da resposta um JSON exatamente neste formato, sem marcações de código (sem \`\`\`):
+                {"acao": "criar_produto", "nome": "Nome do Produto", "preco": 19.90, "descricao": "A copy de vendas que você escreveu"}
+                
+                Se o usuário estiver apenas conversando, responda normalmente, sem o JSON.`;
+
                 let responseText = "";
 
-                if (currentProvider === 'openrouter') {
-                    let lastErr = "";
-                    for (const model of MODELOS_FALLBACK) {
-                        try {
-                            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", { method: "POST", headers: { "Authorization": `Bearer ${iaKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ model, messages: [{ role: "system", content: systemPrompt }, { role: "user", content: text }] }) });
-                            const data = await res.json(); if(data.error) throw new Error(data.error.message);
-                            responseText = data.choices[0].message.content.trim(); break; 
-                        } catch(e) { lastErr = e.message; }
-                    }
-                    if(!responseText) throw new Error("Modelos grátis falharam. " + lastErr);
-                } else if (currentProvider === 'gemini') {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${iaKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }, { text: text }] }] }) });
-                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                if (currentProvider === 'gemini') {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${iaKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }, { text: text }] }] })
+                    });
+                    const data = await res.json();
+                    if(data.error) throw new Error(data.error.message);
                     responseText = data.candidates[0].content.parts[0].text.trim();
+                } else if (currentProvider === 'openrouter') {
+                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST", headers: { "Authorization": `Bearer ${iaKey}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ model: "openrouter/auto", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: text }] })
+                    });
+                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                    responseText = data.choices[0].message.content.trim();
                 }
 
                 responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -261,14 +286,14 @@
                     const textoVisivel = responseText.replace(jsonMatch[0], '').trim();
                     if(textoVisivel) appendMsg('ai', textoVisivel);
                     
-                    appendMsg('ai', `> Produto **${productData.nome}** estruturado. Iniciando automação total...`);
+                    appendMsg('ai', `> Produto **${productData.nome}** (R$ ${productData.preco.toFixed(2)}) estruturado. Iniciando automação total...`);
 
                     if(!caktoId || !caktoSecret || !vercelUrl) {
-                        setTimeout(() => appendMsg('ai', `⚠️ **Falta configurar.** Vá em Config e insira o Client ID, Secret e a URL do Vercel para ativar a automação real.`), 600);
+                        setTimeout(() => appendMsg('ai', `⚠️ **Configuração Incompleta.** Vá em Config (⚙️) e preencha a API Key, Client ID, Secret e a URL do Vercel para liberar a criação automática.`), 600);
                         document.getElementById('sendBtn').disabled = false; return;
                     }
 
-                    // Chamada para a sua API no Vercel (Ponte)
+                    // Chama a Ponte que criamos no Vercel
                     const res = await fetch(`${vercelUrl}/api/criar-produto`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -284,16 +309,16 @@
                     const result = await res.json();
 
                     if(res.ok) {
-                        setTimeout(() => appendMsg('ai', `🎉 **Produto Criado na Cakto!**<br>ID da Cakto: ${result.id || 'Sucesso'}<br>O produto já está no seu painel.`), 600);
+                        appendMsg('ai', `🎉 **Produto Criado e Configurado na Cakto!**<br>O checkout já está ativo.<br><br>📎 Link de Venda: <a href="${result.checkoutUrl}" target="_blank" class="text-neon underline">${result.checkoutUrl}</a>`);
                     } else {
-                        setTimeout(() => appendMsg('ai', `❌ **Erro no Vercel/Cakto:** ${result.error || 'Verifique os logs.'}`), 600);
+                        appendMsg('ai', `❌ **Erro na Ponte:** ${result.error} <br>Detalhe: ${JSON.stringify(result.detalhe || {})}`);
                     }
                 } else {
                     appendMsg('ai', responseText);
                 }
 
             } catch (e) {
-                removeLoader(); appendMsg('ai', `❌ **Erro:** ${e.message}.`);
+                removeLoader(); appendMsg('ai', `❌ **Erro na IA:** ${e.message}.`);
             } finally {
                 document.getElementById('sendBtn').disabled = false;
             }
